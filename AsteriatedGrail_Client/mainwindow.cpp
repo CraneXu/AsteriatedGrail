@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+    client_->CloseTcpClient();
     delete ui;
 }
 

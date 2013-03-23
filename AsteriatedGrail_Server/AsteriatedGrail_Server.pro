@@ -19,10 +19,12 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     src/server_unittest.cpp \
-    src/server.cpp
+    src/server.cpp \
+    src/client_information.cpp
 
 HEADERS += mainwindow.h \
     src/server_unittest.h \
-    src/server.h
+    src/server.h \
+    src/client_information.h
 
 FORMS    += mainwindow.ui

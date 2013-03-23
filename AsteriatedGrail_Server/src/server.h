@@ -3,37 +3,40 @@
 
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QList>
+
+#include "client_information.h"
 
 typedef qint16 Port;
 
 /*
  *A Server that allows one client to connect to
  *Initialize before sending messages
- *Use as follows:
- *Server *server = new Server();
+ *Use like following:
+ *Server *server = new Server(8080);
  *server->InitTcpServer();
- *Uses 5555 as tcp port
+ *server->CloseTcpServer();
  */
 class Server :public QObject
 {
     Q_OBJECT
 public:
-    explicit Server();
+    explicit Server(Port tcpport);
     ~Server();
     void InitTcpServer();
     void CloseTcpServer();
-    void SendMessage(QString msg);
+    void SendMessage(const QString msg);
 protected:
 private:
     bool server_status_;    //true as server on
     Port tcpport_;
     QTcpServer *tcpserver_;
-    QTcpSocket *tcpclient_socket_;
-
+    QList<ClientInformation*> *tcpclients_;
 signals:
     void ReadDone(QString msg);
 private slots:
     void NewClientConnection();
+    void ClientDisconnected();
     void ReadMessage();
 
 };

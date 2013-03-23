@@ -6,7 +6,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    server_ = new Server();
+
+    server_ = new Server(5555);
     server_->InitTcpServer();
     connect(server_,&Server::ReadDone,this,&MainWindow::ShowInText);
 }
