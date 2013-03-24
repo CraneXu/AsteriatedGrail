@@ -6,6 +6,7 @@
 #include <QList>
 
 #include "client_information.h"
+#include "abstract_connector.h"
 
 typedef qint16 Port;
 
@@ -17,7 +18,7 @@ typedef qint16 Port;
  *server->InitTcpServer();
  *server->CloseTcpServer();
  */
-class Server :public QObject
+class Server :public AbstractConnector
 {
     Q_OBJECT
 public:
@@ -25,7 +26,8 @@ public:
     ~Server();
     void InitTcpServer();
     void CloseTcpServer();
-    void SendMessage(const QString msg);
+    QString token();
+    void SendMessage(AbstractConnector &sender, const QString msg);
 protected:
 private:
     bool server_status_;    //true as server on

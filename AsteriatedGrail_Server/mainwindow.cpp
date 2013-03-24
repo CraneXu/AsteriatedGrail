@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     server_ = new Server(5555);
     server_->InitTcpServer();
-    connect(server_,&Server::ReadDone,this,&MainWindow::ShowInText);
+    //connect(server_,&Server::ReadDone,this,&MainWindow::ShowInText);
 }
 
 MainWindow::~MainWindow()
@@ -19,7 +19,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    server_->SendMessage((QString)"hello client! I'm server");
+    server_->SendMessage(*server_,(QString)"hello client! I'm server");
 }
 
 void MainWindow::ShowInText(QString msg)

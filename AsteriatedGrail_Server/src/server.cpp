@@ -14,6 +14,11 @@ Server::~Server()
         this->CloseTcpServer();
 }
 
+QString Server::token()
+{
+    return "SERVER";
+}
+
 void Server::InitTcpServer()
 {
     server_status_ = true;
@@ -55,16 +60,20 @@ void Server::ClientDisconnected()
 void Server::ReadMessage()
 {
     QDataStream in;
-    //in.setDevice(tcpclient_socket_);
     in.setVersion(QDataStream::Qt_5_0);
-    qint64 totalbytes;
-    in >> totalbytes;
-    QString msg;
-    in >> msg;
-    emit ReadDone(msg);
+    foreach(ClientInformation* client, *tcpclients_)
+    {
+        in.setDevice(client->tcpsocket());
+        qint64 totalbytes;
+        in >> totalbytes;
+        QString msg;
+        in >> msg;
+        //emit ReadDone(msg);
+        SendMessage(*this,msg);
+    }
 }
 
-void Server::SendMessage(const QString msg)
+void Server::SendMessage(AbstractConnector &sender, const QString msg)
 {
     QByteArray data = '\0';
     qint64 totalbytes = 0;
@@ -75,9 +84,10 @@ void Server::SendMessage(const QString msg)
     totalbytes = data.size();
     out.device()->seek(0);
     out << totalbytes;
-    //tcpclient_socket_->write(data);
     foreach(ClientInformation* client, *tcpclients_)
     {
-        client->tcpsocket()->write(data);
+        if(sender.token() == client->token())
+            continue;
+        client->WriteData(data);
     }
 }

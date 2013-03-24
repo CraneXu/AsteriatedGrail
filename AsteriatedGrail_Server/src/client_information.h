@@ -4,10 +4,11 @@
 #include <QTcpSocket>
 #include <QHostAddress>
 
+#include "abstract_connector.h"
 /*
  *This class stores every item that a client needs
  */
-class ClientInformation :public QObject
+class ClientInformation :public AbstractConnector
 {
     Q_OBJECT
 public:
@@ -18,6 +19,7 @@ public:
     void set_tcpsocket(QTcpSocket* tcpsocket);
     QHostAddress* hostaddress();
     void set_hostaddress(QHostAddress* hostaddress);
+    void WriteData(QByteArray data);
 protected:
 private:
     QString token_;

@@ -35,3 +35,8 @@ void ClientInformation::set_hostaddress(QHostAddress *hostaddress)
 {
     hostaddress_ = hostaddress;
 }
+
+void ClientInformation::WriteData(QByteArray data)
+{
+    tcpsocket_->write(data);
+}
