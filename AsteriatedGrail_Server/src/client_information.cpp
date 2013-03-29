@@ -3,15 +3,14 @@
 ClientInformation::ClientInformation()
 {
     tcpsocket_ = new QTcpSocket();
-    hostaddress_ = new QHostAddress();
 }
 
 ClientInformation::~ClientInformation()
 {
-
+    delete tcpsocket_;
 }
 
-QString ClientInformation::token()
+QString ClientInformation::token() const
 {
     return token_;
 }
@@ -26,17 +25,15 @@ void ClientInformation::set_tcpsocket(QTcpSocket *tcpsocket)
     tcpsocket_ = tcpsocket;
 }
 
-QHostAddress* ClientInformation::hostaddress()
+QHostAddress ClientInformation::hostaddress()
 {
-    return hostaddress_;
-}
-
-void ClientInformation::set_hostaddress(QHostAddress *hostaddress)
-{
-    hostaddress_ = hostaddress;
+    return tcpsocket_->peerAddress();
 }
 
 void ClientInformation::WriteData(QByteArray data)
 {
-    tcpsocket_->write(data);
+    if(!tcpsocket_)
+        return;
+    if(tcpsocket_->isValid())
+        tcpsocket_->write(data);
 }

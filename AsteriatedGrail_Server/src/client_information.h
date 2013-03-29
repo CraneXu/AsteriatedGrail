@@ -14,17 +14,15 @@ class ClientInformation :public AbstractConnector
 public:
     explicit ClientInformation();
     ~ClientInformation();
-    QString token();
+    QString token() const;
     QTcpSocket* tcpsocket();
-    void set_tcpsocket(QTcpSocket* tcpsocket);
-    QHostAddress* hostaddress();
-    void set_hostaddress(QHostAddress* hostaddress);
+    void set_tcpsocket(QTcpSocket *tcpsocket);
+    QHostAddress hostaddress();
     void WriteData(QByteArray data);
 protected:
 private:
     QString token_;
     QTcpSocket* tcpsocket_;
-    QHostAddress* hostaddress_;
 };
 
 #endif // ASTERIATEDGRAIL_SRC_CLIENT_INFORMATION_H

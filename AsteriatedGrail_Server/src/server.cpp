@@ -6,21 +6,39 @@ Server::Server(Port tcpport):tcpport_(0),tcpserver_(NULL),server_status_(false)
 {
     tcpport_ = tcpport;
     tcpclients_ = new QList<ClientInformation*>();
+    tcpclients_trash_ = new QList<ClientInformation*>();
 }
 
 Server::~Server()
 {
     if(server_status_)
+    {
         this->CloseTcpServer();
+        if(!tcpclients_->empty())
+        {
+            foreach(ClientInformation* client, *tcpclients_)
+                delete client;
+        }
+        if(!tcpclients_trash_->empty())
+        {
+            foreach(ClientInformation* client, *tcpclients_trash_)
+                delete client;
+        }
+        delete tcpserver_;
+    }
+    delete tcpclients_;
+    delete tcpclients_trash_;
 }
 
-QString Server::token()
+QString Server::token() const
 {
     return "SERVER";
 }
 
 void Server::InitTcpServer()
 {
+    if(server_status_)
+        return;         // make sure the server wont be initialized twice or more
     server_status_ = true;
     tcpserver_ = new QTcpServer(NULL);
     tcpserver_->setMaxPendingConnections(6);
@@ -30,6 +48,8 @@ void Server::InitTcpServer()
 
 void Server::CloseTcpServer()
 {
+    if(!server_status_ || tcpclients_->empty())
+        return;
     foreach(ClientInformation* client, *tcpclients_)
     {
         client->tcpsocket()->close();
@@ -42,18 +62,24 @@ void Server::NewClientConnection()
 {
     ClientInformation* client = new ClientInformation();
     client->set_tcpsocket(tcpserver_->nextPendingConnection());
+
     connect(client->tcpsocket(),&QTcpSocket::readyRead,this,&Server::ReadMessage);
-    connect(client->tcpsocket(),&QTcpSocket::disconnected,client->tcpsocket(),&QTcpSocket::deleteLater);
-    connect(client->tcpsocket(),&QTcpSocket::disconnected,this,&Server::ClientDisconnected);
+    connect(client->tcpsocket(),&QTcpSocket::disconnected,this,&Server::ClientDisconnected,Qt::DirectConnection);
+    connect(client->tcpsocket(),&QTcpSocket::disconnected,client->tcpsocket(),&QTcpSocket::deleteLater,Qt::QueuedConnection);
     tcpclients_->push_back(client);
 }
 
 void Server::ClientDisconnected()
 {
+    if(tcpclients_->empty())
+        return;
     foreach(ClientInformation* client, *tcpclients_)
     {
-        if(!client->tcpsocket()->isValid())
+        if(!client->tcpsocket())
+        {
             tcpclients_->removeOne(client);
+            tcpclients_trash_->push_back(client);
+        }
     }
 }
 

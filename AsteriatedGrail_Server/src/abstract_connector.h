@@ -8,6 +8,7 @@ class AbstractConnector : public QObject
     Q_OBJECT
 public:
     explicit AbstractConnector();
+    virtual ~AbstractConnector();
     virtual QString token();
 signals:
     

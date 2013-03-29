@@ -26,7 +26,7 @@ public:
     ~Server();
     void InitTcpServer();
     void CloseTcpServer();
-    QString token();
+    QString token() const;
     void SendMessage(AbstractConnector &sender, const QString msg);
 protected:
 private:
@@ -34,6 +34,7 @@ private:
     Port tcpport_;
     QTcpServer *tcpserver_;
     QList<ClientInformation*> *tcpclients_;
+    QList<ClientInformation*> *tcpclients_trash_;
 signals:
     void ReadDone(QString msg);
 private slots:
