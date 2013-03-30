@@ -14,7 +14,7 @@ class ClientInformation :public AbstractConnector
 public:
     explicit ClientInformation();
     ~ClientInformation();
-    QString token() const;
+    virtual QString token() const;
     QTcpSocket* tcpsocket();
     void set_tcpsocket(QTcpSocket *tcpsocket);
     QHostAddress hostaddress();

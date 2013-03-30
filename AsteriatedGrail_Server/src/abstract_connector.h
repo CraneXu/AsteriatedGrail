@@ -9,7 +9,7 @@ class AbstractConnector : public QObject
 public:
     explicit AbstractConnector();
     virtual ~AbstractConnector();
-    virtual QString token();
+    virtual QString token() const = 0;
 signals:
     
 public slots:

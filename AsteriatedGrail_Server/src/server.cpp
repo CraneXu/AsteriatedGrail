@@ -2,11 +2,13 @@
 
 #include <QDataStream>
 
+
 Server::Server(Port tcpport):tcpport_(0),tcpserver_(NULL),server_status_(false)
 {
     tcpport_ = tcpport;
     tcpclients_ = new QList<ClientInformation*>();
     tcpclients_trash_ = new QList<ClientInformation*>();
+    timer_ = new QTimer(this);
 }
 
 Server::~Server()
@@ -28,6 +30,7 @@ Server::~Server()
     }
     delete tcpclients_;
     delete tcpclients_trash_;
+    delete timer_;
 }
 
 QString Server::token() const
@@ -44,6 +47,8 @@ void Server::InitTcpServer()
     tcpserver_->setMaxPendingConnections(6);
     tcpserver_->listen(QHostAddress::Any,tcpport_);
     connect(tcpserver_,&QTcpServer::newConnection,this,&Server::NewClientConnection);
+    connect(timer_,&QTimer::timeout,this,&Server::ClientDisconnected);
+    timer_->start(5000);
 }
 
 void Server::CloseTcpServer()
@@ -55,6 +60,8 @@ void Server::CloseTcpServer()
         client->tcpsocket()->close();
     }
     tcpserver_->close();
+    if(timer_->isActive())
+        timer_->stop();
     server_status_ = false;
 }
 
@@ -62,10 +69,9 @@ void Server::NewClientConnection()
 {
     ClientInformation* client = new ClientInformation();
     client->set_tcpsocket(tcpserver_->nextPendingConnection());
-
     connect(client->tcpsocket(),&QTcpSocket::readyRead,this,&Server::ReadMessage);
-    connect(client->tcpsocket(),&QTcpSocket::disconnected,this,&Server::ClientDisconnected,Qt::DirectConnection);
-    connect(client->tcpsocket(),&QTcpSocket::disconnected,client->tcpsocket(),&QTcpSocket::deleteLater,Qt::QueuedConnection);
+    //connect(client->tcpsocket(),&QTcpSocket::disconnected,this,&Server::ClientDisconnected,Qt::DirectConnection);
+    //connect(client->tcpsocket(),&QTcpSocket::disconnected,client->tcpsocket(),&QTcpSocket::deleteLater,Qt::QueuedConnection);
     tcpclients_->push_back(client);
 }
 
@@ -75,7 +81,7 @@ void Server::ClientDisconnected()
         return;
     foreach(ClientInformation* client, *tcpclients_)
     {
-        if(!client->tcpsocket())
+        if(client->tcpsocket()->state() != QAbstractSocket::ConnectedState)
         {
             tcpclients_->removeOne(client);
             tcpclients_trash_->push_back(client);
@@ -95,7 +101,7 @@ void Server::ReadMessage()
         QString msg;
         in >> msg;
         //emit ReadDone(msg);
-        SendMessage(*this,msg);
+        SendMessage(*client,msg);
     }
 }
 

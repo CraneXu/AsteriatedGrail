@@ -4,6 +4,7 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QList>
+#include <QTimer>
 
 #include "client_information.h"
 #include "abstract_connector.h"
@@ -35,6 +36,7 @@ private:
     QTcpServer *tcpserver_;
     QList<ClientInformation*> *tcpclients_;
     QList<ClientInformation*> *tcpclients_trash_;
+    QTimer *timer_;
 signals:
     void ReadDone(QString msg);
 private slots:

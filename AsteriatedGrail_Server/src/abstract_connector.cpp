@@ -9,7 +9,3 @@ AbstractConnector::~AbstractConnector()
 
 }
 
-QString AbstractConnector::token()
-{
-    return '\0';
-}
